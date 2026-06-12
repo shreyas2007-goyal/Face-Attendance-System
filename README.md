@@ -87,7 +87,7 @@ FACE_ATTENDANCE/
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/Face-Attendance-System.git
+git clone https://github.com/shreyas2007-goyal/Face-Attendance-System.git
 cd Face-Attendance-System
 ```
 
