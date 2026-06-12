@@ -1,0 +1,6 @@
+opencv-python
+numpy
+pillow
+sqlite3
+tkcalendar
+deepface

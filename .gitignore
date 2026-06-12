@@ -1,0 +1,39 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual Environment
+penv/
+venv/
+.venv/
+
+# Database
+*.db
+*.sqlite3
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+
+# Logs
+*.log
+
+# Face Recognition Data
+dataset/
+trainer/
+models/
+encodings.pkl
+face_recognizer.yml
+
+# CSV Exports
+*.csv
+penv/
+__pycache__/
+*.db
+*.sqlite3
+*.csv
+*.pkl
+*.yml
