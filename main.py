@@ -220,7 +220,6 @@ class FaceAttendanceSystem:
 • Real-Time Attendance
 • SQLite Database
 • CSV Export
-
 • OpenCV Camera
 • Student Analytics
             """,
@@ -277,7 +276,6 @@ class FaceAttendanceSystem:
             width=280,
             height=170
         )
-
         Label(
             card,
             text=title,
@@ -285,7 +283,6 @@ class FaceAttendanceSystem:
             bg=self.card_color,
             fg=color
         ).pack(pady=20)
-
         value_lbl = Label(
             card,
             text=value,
