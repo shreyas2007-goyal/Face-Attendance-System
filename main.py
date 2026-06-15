@@ -239,7 +239,6 @@ class FaceAttendanceSystem:
             x=850,
             y=700
         )
-
         self.update_dashboard_stats()
         self.animate_title()
 
