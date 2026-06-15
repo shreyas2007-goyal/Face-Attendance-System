@@ -79,7 +79,6 @@ FACE_ATTENDANCE/
 ├── README.md
 └── .gitignore
 ```
-
 ---
 
 ## Installation
