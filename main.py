@@ -1,6 +1,7 @@
 from tkinter import *
 import time
-
+import sqlite3
+import cv2
 from register_student import RegisterStudent
 from face_registration import FaceRecognition
 from attendance import AttendanceSystem

@@ -4,3 +4,4 @@ pillow
 sqlite3
 tkcalendar
 deepface
+tf-keras
