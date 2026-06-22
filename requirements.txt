@@ -1,7 +1,9 @@
 opencv-python
 numpy
 pillow
-sqlite3
-tkcalendar
+pandas
 deepface
 tf-keras
+tensorflow
+retina-face
+mtcnn
