@@ -12,29 +12,19 @@ class RegisterStudent:
         self.root = root
 
         self.root.geometry("900x650+250+50")
-
         self.root.title("Register Student")
-
         self.root.config(bg="white")
-
-        # DATABASE
 
         self.db = DatabaseManager()
 
         # VARIABLES
 
         self.var_name = StringVar()
-
         self.var_reg = StringVar()
-
         self.var_department = StringVar()
-
         self.var_branch = StringVar()
-
         self.var_section = StringVar()
-
         self.var_batch = StringVar()
-
         self.var_roll = StringVar()
 
         # TITLE
@@ -65,11 +55,7 @@ class RegisterStudent:
             height=450
         )
 
-        label_font = (
-            "Arial",
-            14,
-            "bold"
-        )
+        label_font = ("Arial", 14, "bold")
 
         # NAME
 
@@ -195,7 +181,7 @@ class RegisterStudent:
             height=50
         )
 
-        # FACE BUTTON
+        # ADD FACE BUTTON
 
         add_face_btn = Button(
             self.root,
@@ -217,29 +203,32 @@ class RegisterStudent:
     # =====================================
     # SAVE STUDENT
     # =====================================
+
     def save_student(self):
 
-        if self.var_name.get() == "":
+        if (
+            self.var_name.get().strip() == "" or
+            self.var_reg.get().strip() == "" or
+            self.var_roll.get().strip() == ""
+        ):
+
             messagebox.showerror(
                 "Error",
-                "Please Enter Student Name"
+                "Name, Registration Number and Roll Number are required"
             )
             return
 
         try:
 
             self.db.add_student(
-                self.var_name.get(),
-                self.var_reg.get(),
-                self.var_department.get(),
-                self.var_branch.get(),
-                self.var_section.get(),
-                self.var_batch.get(),
-                self.var_roll.get()
+                self.var_name.get().strip(),
+                self.var_reg.get().strip(),
+                self.var_department.get().strip(),
+                self.var_branch.get().strip(),
+                self.var_section.get().strip(),
+                self.var_batch.get().strip(),
+                self.var_roll.get().strip()
             )
-
-            print("Student Saved Successfully")
-            print("Total Students:", self.db.get_total_students())
 
             messagebox.showinfo(
                 "Success",
@@ -250,35 +239,32 @@ class RegisterStudent:
 
         except Exception as e:
 
-            print("Database Error:", e)
-   
+            messagebox.showerror(
+                "Database Error",
+                str(e)
+            )
+
     # =====================================
-    # CLEAR FORM
+    # CLEAR FIELDS
     # =====================================
 
     def clear_fields(self):
 
         self.var_name.set("")
-
         self.var_reg.set("")
-
         self.var_department.set("")
-
         self.var_branch.set("")
-
         self.var_section.set("")
-
         self.var_batch.set("")
-
         self.var_roll.set("")
 
     # =====================================
-    # ADD FACE
+    # OPEN FACE WINDOW
     # =====================================
 
     def open_add_face(self):
 
-        if self.var_name.get() == "":
+        if self.var_name.get().strip() == "":
 
             messagebox.showerror(
                 "Error",
@@ -287,11 +273,16 @@ class RegisterStudent:
 
             return
 
-        new_window = Toplevel(
-            self.root
+        AddFace(
+            Toplevel(self.root),
+            self.var_name.get().strip()
         )
 
-        AddFace(
-            new_window,
-            self.var_name.get()
-        )
+
+if __name__ == "__main__":
+
+    root = Tk()
+
+    app = RegisterStudent(root)
+
+    root.mainloop()

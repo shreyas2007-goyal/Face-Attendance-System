@@ -24,8 +24,8 @@ class DatabaseManager:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS students(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT,
-                registration TEXT,
+                name TEXT NOT NULL,
+                registration TEXT UNIQUE,
                 department TEXT,
                 branch TEXT,
                 section TEXT,
@@ -77,8 +77,20 @@ class DatabaseManager:
         conn = sqlite3.connect(self.student_db)
         cursor = conn.cursor()
 
-        cursor.execute("""
-            INSERT INTO students(
+        try:
+
+            cursor.execute("""
+                INSERT INTO students(
+                    name,
+                    registration,
+                    department,
+                    branch,
+                    section,
+                    batch,
+                    roll
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (
                 name,
                 registration,
                 department,
@@ -86,20 +98,19 @@ class DatabaseManager:
                 section,
                 batch,
                 roll
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (
-            name,
-            registration,
-            department,
-            branch,
-            section,
-            batch,
-            roll
-        ))
+            ))
 
-        conn.commit()
-        conn.close()
+            conn.commit()
+
+        except sqlite3.IntegrityError:
+
+            raise Exception(
+                "Registration Number Already Exists"
+            )
+
+        finally:
+
+            conn.close()
 
     # =====================================
     # TOTAL STUDENTS

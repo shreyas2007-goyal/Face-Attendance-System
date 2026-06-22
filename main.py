@@ -1,7 +1,6 @@
 from tkinter import *
 import time
-import sqlite3
-import cv2
+
 from register_student import RegisterStudent
 from face_registration import FaceRecognition
 from attendance import AttendanceSystem
@@ -14,11 +13,17 @@ class FaceAttendanceSystem:
 
         self.root = root
         self.root.title("AI Powered Face Attendance System")
-        self.root.state("zoomed")
+
+        try:
+            self.root.state("zoomed")
+        except:
+            self.root.attributes("-zoomed", True)
 
         self.db = DatabaseManager()
 
-        # COLORS
+        # ==========================
+        # THEME
+        # ==========================
 
         self.dark_mode = True
 
@@ -26,7 +31,7 @@ class FaceAttendanceSystem:
         self.dark_card = "#1e293b"
         self.dark_sidebar = "#111827"
 
-        self.light_bg = "#f1f5f9"
+        self.light_bg = "#f8fafc"
         self.light_card = "#ffffff"
         self.light_sidebar = "#dbeafe"
 
@@ -37,7 +42,9 @@ class FaceAttendanceSystem:
 
         self.root.configure(bg=self.bg_color)
 
+        # ==========================
         # TOP BAR
+        # ==========================
 
         self.top_frame = Frame(
             self.root,
@@ -49,41 +56,49 @@ class FaceAttendanceSystem:
 
         self.title_lbl = Label(
             self.top_frame,
-            text=" FACE ATTENDANCE SYSTEM",
+            text="AI POWERED FACE ATTENDANCE SYSTEM",
             font=("Arial", 24, "bold"),
             bg=self.sidebar_color,
-            fg="white"
+            fg="#38bdf8"
         )
 
-        self.title_lbl.place(x=20, y=15)
+        self.title_lbl.place(
+            x=20,
+            y=15
+        )
 
         self.clock_lbl = Label(
             self.top_frame,
             font=("Arial", 14, "bold"),
             bg=self.sidebar_color,
-            fg="#38bdf8"
+            fg="white"
         )
 
-        self.clock_lbl.place(x=1100, y=20)
-
-        self.update_clock()
+        self.clock_lbl.place(
+            x=1050,
+            y=20
+        )
 
         self.theme_btn = Button(
             self.top_frame,
             text="☀ Light Mode",
+            font=("Arial", 11, "bold"),
             bg="#f59e0b",
             fg="white",
+            cursor="hand2",
             command=self.toggle_theme
         )
 
         self.theme_btn.place(
-            x=1320,
+            x=1280,
             y=15,
-            width=150,
+            width=160,
             height=40
         )
 
+        # ==========================
         # SIDEBAR
+        # ==========================
 
         self.sidebar = Frame(
             self.root,
@@ -124,7 +139,9 @@ class FaceAttendanceSystem:
             self.exit_app
         )
 
+        # ==========================
         # DASHBOARD
+        # ==========================
 
         self.dashboard = Frame(
             self.root,
@@ -136,73 +153,75 @@ class FaceAttendanceSystem:
             expand=True
         )
 
-        self.welcome_lbl = Label(
+        Label(
             self.dashboard,
             text="Welcome To AI Dashboard",
             font=("Arial", 30, "bold"),
             bg=self.bg_color,
             fg=self.text_color
-        )
-
-        self.welcome_lbl.place(
+        ).place(
             x=60,
             y=30
         )
 
-        self.subtitle_lbl = Label(
+        Label(
             self.dashboard,
-            text="DeepFace + SQLite + OpenCV + AI",
+            text="DeepFace + OpenCV + SQLite + Python",
             font=("Arial", 16),
             bg=self.bg_color,
             fg="#94a3b8"
-        )
-
-        self.subtitle_lbl.place(
+        ).place(
             x=65,
             y=85
         )
 
+        # ==========================
         # CARDS
+        # ==========================
 
         self.total_students_lbl = self.create_card(
-            60, 160,
+            60,
+            160,
             "👥 Total Students",
-            "0",
             "#3b82f6"
         )
 
         self.present_students_lbl = self.create_card(
-            390, 160,
+            390,
+            160,
             "✅ Present Today",
-            "0",
             "#10b981"
         )
 
         self.absent_students_lbl = self.create_card(
-            720, 160,
+            720,
+            160,
             "❌ Absent Today",
-            "0",
             "#ef4444"
         )
 
         self.late_students_lbl = self.create_card(
-            1050, 160,
+            1050,
+            160,
             "⏰ Late Today",
-            "0",
             "#f59e0b"
         )
 
-        # FEATURES
+        # ==========================
+        # FEATURES FRAME
+        # ==========================
 
         feature_frame = Frame(
             self.dashboard,
-            bg=self.card_color
+            bg=self.card_color,
+            bd=2,
+            relief=RIDGE
         )
 
         feature_frame.place(
             x=60,
-            y=380,
-            width=1000,
+            y=390,
+            width=1050,
             height=250
         )
 
@@ -217,12 +236,21 @@ class FaceAttendanceSystem:
         Label(
             feature_frame,
             text="""
-• DeepFace Recognition
-• Real-Time Attendance
-• SQLite Database
-• CSV Export
-• OpenCV Camera
-• Student Analytics
+• Student Registration System
+
+• Face Dataset Collection
+
+• DeepFace Recognition Engine
+
+• Real-Time Attendance Marking
+
+• SQLite Database Storage
+
+• Attendance Reports Export
+
+• Present / Absent Analytics
+
+• Dark & Light Mode Dashboard
             """,
             font=("Arial", 15),
             justify=LEFT,
@@ -237,37 +265,25 @@ class FaceAttendanceSystem:
             bg=self.bg_color,
             fg="#94a3b8"
         ).place(
-            x=850,
+            x=950,
             y=700
         )
+
+        self.update_clock()
         self.update_dashboard_stats()
         self.animate_title()
 
-    def create_sidebar_button(self, text, command):
+    # ===================================
+    # CARD
+    # ===================================
 
-        btn = Button(
-            self.sidebar,
-            text=text,
-            font=("Arial", 14, "bold"),
-            bg=self.sidebar_color,
-            fg="white",
-            bd=0,
-            anchor="w",
-            padx=20,
-            command=command
-        )
-
-        btn.pack(
-            fill=X,
-            pady=8,
-            ipady=12
-        )
-
-    def create_card(self, x, y, title, value, color):
+    def create_card(self, x, y, title, color):
 
         card = Frame(
             self.dashboard,
-            bg=self.card_color
+            bg=self.card_color,
+            bd=2,
+            relief=RIDGE
         )
 
         card.place(
@@ -276,6 +292,7 @@ class FaceAttendanceSystem:
             width=280,
             height=170
         )
+
         Label(
             card,
             text=title,
@@ -283,9 +300,10 @@ class FaceAttendanceSystem:
             bg=self.card_color,
             fg=color
         ).pack(pady=20)
+
         value_lbl = Label(
             card,
-            text=value,
+            text="0",
             font=("Arial", 40, "bold"),
             bg=self.card_color,
             fg=self.text_color
@@ -294,6 +312,33 @@ class FaceAttendanceSystem:
         value_lbl.pack()
 
         return value_lbl
+
+    # ===================================
+    # SIDEBAR BUTTON
+    # ===================================
+
+    def create_sidebar_button(self, text, command):
+
+        Button(
+            self.sidebar,
+            text=text,
+            font=("Arial", 14, "bold"),
+            bg=self.sidebar_color,
+            fg="white",
+            bd=0,
+            anchor="w",
+            padx=20,
+            cursor="hand2",
+            command=command
+        ).pack(
+            fill=X,
+            pady=8,
+            ipady=12
+        )
+
+    # ===================================
+    # DASHBOARD STATS
+    # ===================================
 
     def update_dashboard_stats(self):
 
@@ -317,6 +362,12 @@ class FaceAttendanceSystem:
                 )
             )
 
+            self.late_students_lbl.config(
+                text=str(
+                    self.db.get_late_today()
+                )
+            )
+
         except Exception as e:
 
             print("Dashboard Error:", e)
@@ -326,11 +377,15 @@ class FaceAttendanceSystem:
             self.update_dashboard_stats
         )
 
+    # ===================================
+    # CLOCK
+    # ===================================
+
     def update_clock(self):
 
         self.clock_lbl.config(
             text=time.strftime(
-                "%d-%m-%Y %H:%M:%S"
+                "%d-%m-%Y  %H:%M:%S"
             )
         )
 
@@ -338,6 +393,10 @@ class FaceAttendanceSystem:
             1000,
             self.update_clock
         )
+
+    # ===================================
+    # ANIMATION
+    # ===================================
 
     def animate_title(self):
 
@@ -359,6 +418,10 @@ class FaceAttendanceSystem:
             self.animate_title
         )
 
+    # ===================================
+    # THEME
+    # ===================================
+
     def toggle_theme(self):
 
         self.dark_mode = not self.dark_mode
@@ -370,6 +433,10 @@ class FaceAttendanceSystem:
             self.sidebar_color = self.dark_sidebar
             self.text_color = "white"
 
+            self.theme_btn.config(
+                text="☀ Light Mode"
+            )
+
         else:
 
             self.bg_color = self.light_bg
@@ -377,7 +444,15 @@ class FaceAttendanceSystem:
             self.sidebar_color = self.light_sidebar
             self.text_color = "black"
 
+            self.theme_btn.config(
+                text="🌙 Dark Mode"
+            )
+
         self.root.configure(bg=self.bg_color)
+
+    # ===================================
+    # WINDOWS
+    # ===================================
 
     def open_register_student(self):
 

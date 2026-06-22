@@ -5,9 +5,10 @@ from tkinter import filedialog
 
 import cv2
 import csv
+import os
 
 from datetime import datetime
-import deepface
+from deepface import DeepFace
 
 from database import DatabaseManager
 
@@ -19,18 +20,17 @@ class AttendanceSystem:
         self.root = root
 
         self.root.geometry("1000x700+200+30")
-
         self.root.title("Attendance System")
-
         self.root.config(bg="white")
 
         self.db = DatabaseManager()
 
-        self.var_start_time = StringVar()
-        self.var_present_time = StringVar()
-        self.var_late_time = StringVar()
+        # FIXED VARIABLE
+        self.var_closing_time = StringVar()
 
+        # =========================
         # TITLE
+        # =========================
 
         title_lbl = Label(
             self.root,
@@ -42,7 +42,9 @@ class AttendanceSystem:
 
         title_lbl.pack(fill=X)
 
+        # =========================
         # TOP FRAME
+        # =========================
 
         top_frame = Frame(
             self.root,
@@ -63,7 +65,10 @@ class AttendanceSystem:
             text="Attendance Closing Time",
             font=("Arial", 14, "bold"),
             bg="white"
-        ).place(x=40, y=40)
+        ).place(
+            x=40,
+            y=40
+        )
 
         Entry(
             top_frame,
@@ -81,41 +86,42 @@ class AttendanceSystem:
             font=("Arial", 11),
             bg="white",
             fg="gray"
-        ).place(x=320, y=75)
+        ).place(
+            x=320,
+            y=75
+        )
 
-        take_btn = Button(
+        Button(
             top_frame,
             text="Take Attendance",
             font=("Arial", 15, "bold"),
             bg="green",
             fg="white",
             command=self.take_attendance
-        )
-
-        take_btn.place(
+        ).place(
             x=120,
             y=110,
             width=220,
             height=45
         )
 
-        download_btn = Button(
+        Button(
             top_frame,
             text="Download Attendance",
             font=("Arial", 15, "bold"),
             bg="blue",
             fg="white",
             command=self.download_attendance
-        )
-
-        download_btn.place(
+        ).place(
             x=500,
             y=110,
             width=250,
             height=45
         )
 
+        # =========================
         # TABLE FRAME
+        # =========================
 
         table_frame = Frame(
             self.root,
@@ -192,6 +198,26 @@ class AttendanceSystem:
 
         self.attendance_table["show"] = "headings"
 
+        self.attendance_table.column(
+            "name",
+            width=250
+        )
+
+        self.attendance_table.column(
+            "date",
+            width=150
+        )
+
+        self.attendance_table.column(
+            "time",
+            width=150
+        )
+
+        self.attendance_table.column(
+            "status",
+            width=150
+        )
+
         self.attendance_table.pack(
             fill=BOTH,
             expand=True
@@ -199,9 +225,9 @@ class AttendanceSystem:
 
         self.load_attendance()
 
-    # ==============================
+    # =========================
     # LOAD ATTENDANCE
-    # ==============================
+    # =========================
 
     def load_attendance(self):
 
@@ -215,25 +241,31 @@ class AttendanceSystem:
             self.attendance_table.insert(
                 "",
                 END,
-                values=(
-                    record[0],
-                    record[1],
-                    record[2],
-                    record[3]
-                )
+                values=record
             )
 
-    # ==============================
+    # =========================
     # TAKE ATTENDANCE
-    # ==============================
+    # =========================
 
     def take_attendance(self):
 
-        if self.var_closing_time.get() == "":
+        closing_time = self.var_closing_time.get().strip()
+
+        if closing_time == "":
 
             messagebox.showerror(
                 "Error",
                 "Please Enter Closing Time"
+            )
+
+            return
+
+        if not os.path.exists("dataset"):
+
+            messagebox.showerror(
+                "Error",
+                "Dataset Folder Not Found"
             )
 
             return
@@ -268,7 +300,7 @@ class AttendanceSystem:
 
             try:
 
-                result = deepface.DeepFace.find(
+                result = DeepFace.find(
                     img_path="temp.jpg",
                     db_path="dataset",
                     model_name="Facenet512",
@@ -310,17 +342,13 @@ class AttendanceSystem:
                             "%H:%M:%S"
                         )
 
-                        if current_time_str <= self.var_present_time.get():
+                        if current_time_str <= closing_time:
 
-                             status = "Present"
-
-                        elif current_time_str <= self.var_late_time.get():
-
-                            status = "Late"
+                            status = "Present"
 
                         else:
 
-                            status = "Absent"
+                            status = "Late"
 
                         self.db.mark_attendance(
                             detected_name,
@@ -342,7 +370,9 @@ class AttendanceSystem:
 
                     detected_name = "Unknown Face"
 
-            except Exception:
+            except Exception as e:
+
+                print(e)
 
                 detected_name = "Unknown Face"
 
@@ -370,16 +400,19 @@ class AttendanceSystem:
 
         cv2.destroyAllWindows()
 
+        if os.path.exists("temp.jpg"):
+            os.remove("temp.jpg")
+
         self.load_attendance()
 
         messagebox.showinfo(
-            "Attendance",
+            "Success",
             "Attendance Recorded Successfully"
         )
 
-    # ==============================
+    # =========================
     # EXPORT CSV
-    # ==============================
+    # =========================
 
     def download_attendance(self):
 
@@ -388,7 +421,7 @@ class AttendanceSystem:
         save_path = filedialog.asksaveasfilename(
             defaultextension=".csv",
             filetypes=[
-                ("CSV File", "*.csv")
+                ("CSV Files", "*.csv")
             ]
         )
 
@@ -404,14 +437,12 @@ class AttendanceSystem:
 
             writer = csv.writer(file)
 
-            writer.writerow(
-                [
-                    "Student Name",
-                    "Date",
-                    "Time",
-                    "Status"
-                ]
-            )
+            writer.writerow([
+                "Student Name",
+                "Date",
+                "Time",
+                "Status"
+            ])
 
             for row in records:
                 writer.writerow(row)
@@ -420,3 +451,12 @@ class AttendanceSystem:
             "Success",
             "Attendance Exported Successfully"
         )
+
+
+if __name__ == "__main__":
+
+    root = Tk()
+
+    app = AttendanceSystem(root)
+
+    root.mainloop()
